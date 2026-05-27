@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIP Exam Crash Course</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111520;
+    --border: #1e2535;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #a8ff3e;
+    --text: #c8d4e8;
+    --muted: #5a6a82;
+    --formula-bg: #0d1520;
+    --example-bg: #0c1a0c;
+    --tip-bg: #1a0d0a;
+    --header-bg: #060810;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── TOP NAV ─── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .topbar::-webkit-scrollbar { display: none; }
+  .topbar-title {
+    font-size: 13px; font-weight: 800; color: var(--accent);
+    letter-spacing: 2px; white-space: nowrap; margin-right: 12px;
+    text-transform: uppercase;
+  }
+  .nav-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.07);
+  }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 860px; margin: 0 auto; padding: 30px 20px 80px; }
+
+  /* ─── SECTION ─── */
+  .section { display: none; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .section-header {
+    display: flex; align-items: baseline; gap: 14px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px; margin-bottom: 26px;
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--accent); letter-spacing: 2px;
+  }
+  .section-title {
+    font-size: 26px; font-weight: 800; color: #e8f0ff;
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--accent); letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  p { line-height: 1.75; color: var(--text); font-size: 15px; margin-bottom: 10px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ─── FORMULA BOX ─── */
+  .formula {
+    background: var(--formula-bg);
+    border: 1px solid #1a3050;
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: #a8d8ff;
+    line-height: 1.9;
+  }
+  .formula .label {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 2px;
+    display: block; margin-bottom: 6px;
+  }
+
+  /* ─── EXAMPLE BOX ─── */
+  .example {
+    background: var(--example-bg);
+    border: 1px solid #1a3520;
+    border-left: 3px solid var(--accent3);
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin: 14px 0;
+  }
+  .example-title {
+    font-size: 11px; font-weight: 700; color: var(--accent3);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .example p { font-size: 14px; margin-bottom: 8px; }
+
+  /* ─── TIP BOX ─── */
+  .tip {
+    background: var(--tip-bg);
+    border: 1px solid #2a1510;
+    border-left: 3px solid var(--accent2);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .tip-title {
+    font-size: 11px; font-weight: 700; color: var(--accent2);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;
+  }
+
+  /* ─── GRID / TABLE ─── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+  @media(max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+  th { background: #0d1525; color: var(--accent); font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 1px; padding: 9px 12px; text-align: left;
+    border-bottom: 1px solid var(--border); }
+  td { padding: 8px 12px; border-bottom: 1px solid #0f1520; color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ─── KERNEL DISPLAY ─── */
+  .kernel-wrap { display: flex; gap: 30px; flex-wrap: wrap; align-items: flex-start; margin: 14px 0; }
+  .kernel-block { text-align: center; }
+  .kernel-label { font-size: 11px; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; }
+  .kernel {
+    display: inline-grid;
+    border: 1px solid #1e3050;
+    border-radius: 4px;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+  .kernel.k3 { grid-template-columns: repeat(3, 44px); }
+  .kernel.k5 { grid-template-columns: repeat(5, 38px); }
+  .kernel span {
+    padding: 9px 6px; text-align: center;
+    border: 1px solid #0d1830;
+    color: #a8d8ff;
+  }
+  .kernel span.center { background: rgba(0,212,255,0.12); color: var(--accent); font-weight: 700; }
+  .kernel span.neg { color: #ff7070; }
+  .kernel span.pos { color: var(--accent3); }
+  .kernel span.zero { color: var(--muted); }
+
+  /* ─── STEPS ─── */
+  .steps { counter-reset: step; margin: 10px 0; }
+  .step {
+    display: flex; gap: 14px; margin-bottom: 12px;
+    align-items: flex-start;
+  }
+  .step-num {
+    counter-increment: step;
+    background: var(--accent);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    width: 22px; height: 22px; min-width: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 2px;
+  }
+  .step p { margin: 0; font-size: 14px; }
+
+  /* ─── BADGE ─── */
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 3px;
+    letter-spacing: 1px; margin: 0 3px;
+  }
+  .badge.linear { background: rgba(0,212,255,0.15); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+  .badge.nonlinear { background: rgba(255,107,53,0.15); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); }
+  .badge.low { background: rgba(168,255,62,0.1); color: var(--accent3); border: 1px solid rgba(168,255,62,0.3); }
+  .badge.high { background: rgba(255,80,80,0.1); color: #ff8080; border: 1px solid rgba(255,80,80,0.3); }
+
+  /* ─── HIGHLIGHT ─── */
+  .hl { color: var(--accent); font-weight: 700; }
+  .hl2 { color: var(--accent2); font-weight: 700; }
+  .hl3 { color: var(--accent3); font-weight: 700; }
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+
+  /* ─── COMPARISON TABLE ─── */
+  .compare-row { display: flex; gap: 14px; margin: 14px 0; }
+  .compare-card {
+    flex: 1; background: var(--formula-bg);
+    border: 1px solid var(--border); border-radius: 6px; padding: 16px;
+  }
+  .compare-card h4 { font-size: 13px; margin-bottom: 10px; }
+  .compare-card.left h4 { color: var(--accent); }
+  .compare-card.right h4 { color: var(--accent2); }
+  .compare-card p { font-size: 13px; }
+  @media(max-width:500px){ .compare-row { flex-direction: column; } }
+
+  /* ─── PIXEL GRID ─── */
+  .pixel-grid { display: inline-grid; gap: 2px; margin: 8px 0; }
+  .pixel-grid span {
+    width: 42px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    border: 1px solid #1e2535; border-radius: 3px;
+    background: var(--formula-bg);
+  }
+  .pixel-grid span.hl-cell { background: rgba(0,212,255,0.12); color: var(--accent); border-color: var(--accent); }
+  .pixel-grid span.result-cell { background: rgba(168,255,62,0.1); color: var(--accent3); border-color: var(--accent3); }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-title">DIP Exam</span>
+  <button class="nav-btn active" onclick="show('basics')">① Basics</button>
+  <button class="nav-btn" onclick="show('linear')">② Lin vs Non-Lin</button>
+  <button class="nav-btn" onclick="show('lowpass')">③ Low-Pass</button>
+  <button class="nav-btn" onclick="show('highpass')">④ High-Pass</button>
+  <button class="nav-btn" onclick="show('laplacian')">⑤ Laplacian</button>
+  <button class="nav-btn" onclick="show('sobel')">⑥ Sobel</button>
+  <button class="nav-btn" onclick="show('nonlinear')">⑦ Non-Linear</button>
+  <button class="nav-btn" onclick="show('histogram')">⑧ Histogram Eq</button>
+  <button class="nav-btn" onclick="show('geom')">⑨ Geo Transforms</button>
+  <button class="nav-btn" onclick="show('mapping')">⑩ Fwd/Bkwd Map</button>
+  <button class="nav-btn" onclick="show('bilinear')">⑪ Bilinear Interp</button>
+  <button class="nav-btn" onclick="show('cheatsheet')">⚡ Cheat Sheet</button>
+</div>
+
+<div class="container">
+
+<!-- ─── SECTION 1: BASICS ─── -->
+<div class="section active" id="basics">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h1 class="section-title">Spatial Filtering — The Foundation</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What is an Image?</div>
+    <p>An image is a <span class="hl">2D grid of numbers</span> (pixels). Each pixel holds an intensity value — typically 0 (black) to 255 (white) for an 8-bit grayscale image. Color images have 3 channels (R, G, B).</p>
+    <div class="formula">
+      <span class="label">Image representation</span>
+      f(x, y)  →  value at row x, column y<br>
+      Range: [0, 255]  for 8-bit grayscale<br>
+      Size:  M × N pixels
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What is Spatial Filtering?</div>
+    <p>You take a small <span class="hl">mask (kernel)</span> — usually 3×3 or 5×5 — and slide it over every pixel in the image. At each position, you do math between the mask values and the image pixels underneath to produce a new pixel value.</p>
+    <div class="formula">
+      <span class="label">General formula (linear filter)</span>
+      g(x,y) = Σ Σ  w(s,t) · f(x+s, y+t)<br><br>
+      where w = mask weights,  f = input image,  g = output image
+    </div>
+    <div class="tip">
+      <div class="tip-title">📐 Key Vocabulary</div>
+      <p style="font-size:13px;"><span class="hl">Mask / Kernel / Filter / Template</span> — all the same thing. The small weight grid you slide over the image.</p>
+      <p style="font-size:13px;"><span class="hl">Boundary problem</span> — when the mask goes outside the image edges. <strong>Solution: Ignore boundary pixels</strong> (copy them as-is). This is what your quiz says "Ignore the boundary" — just keep the border row/column unchanged from the original.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Correlation vs Convolution</div>
+    <div class="compare-row">
+      <div class="compare-card left">
+        <h4>Correlation</h4>
+        <p>Slide the mask as-is. Used for <strong>pattern matching</strong> — finding where a template exists in an image (maximum similarity point).</p>
+      </div>
+      <div class="compare-card right">
+        <h4>Convolution</h4>
+        <p>Flip the mask 180° (horizontally AND vertically) before sliding. Used for applying <strong>mathematical filters</strong>.</p>
+      </div>
+    </div>
+    <div class="tip">
+      <div class="tip-title">🔑 Trick Question</div>
+      <p>When are they the same? When the mask is <span class="hl">symmetric</span> (looks the same after flipping). Example: averaging mask (all 1/9s), Gaussian, Laplacian. The flip doesn't change them.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 2: LINEAR vs NON-LINEAR ─── -->
+<div class="section" id="linear">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h1 class="section-title">Linear vs Non-Linear Filters</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Core Distinction</div>
+    <div class="compare-row">
+      <div class="compare-card left">
+        <h4>LINEAR <span class="badge linear">LINEAR</span></h4>
+        <p>Output = <strong>Weighted Sum</strong></p>
+        <p>Math: multiply each pixel by a weight, add them all up.</p>
+        <p style="color:#5a6a82; margin-top:8px; font-size:12px;">Examples: Averaging, Gaussian, Laplacian, Sobel</p>
+      </div>
+      <div class="compare-card right">
+        <h4>NON-LINEAR <span class="badge nonlinear">NON-LINEAR</span></h4>
+        <p>Output = <strong>Sorting / Logic</strong></p>
+        <p>No multiplication. Just sort and pick (max, min, median).</p>
+        <p style="color:#5a6a82; margin-top:8px; font-size:12px;">Examples: Max, Min, Median filter</p>
+      </div>
+    </div>
+    <div class="formula">
+      <span class="label">Linear filter test</span>
+      g(x,y) = w₁·f₁ + w₂·f₂ + ... + wₙ·fₙ  ← Linear (weighted sum)<br>
+      g(x,y) = max(f₁, f₂, ..., fₙ)           ← Non-Linear (no weights)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Why Does This Distinction Matter?</div>
+    <table>
+      <tr><th>Property</th><th>Linear</th><th>Non-Linear</th></tr>
+      <tr><td>Superposition holds?</td><td style="color:var(--accent3)">Yes</td><td style="color:var(--accent2)">No</td></tr>
+      <tr><td>Math operation</td><td>Multiply + Add</td><td>Sort / Compare</td></tr>
+      <tr><td>Mask weights used?</td><td style="color:var(--accent3)">Yes</td><td style="color:var(--accent2)">No</td></tr>
+      <tr><td>Edge-preserving?</td><td style="color:var(--accent2)">Poor</td><td style="color:var(--accent3)">Better (Median)</td></tr>
+    </table>
+    <div class="tip">
+      <div class="tip-title">⚡ Exam Memory Trick</div>
+      <p>Linear = "L" = Linear equation (multiply & add). Non-Linear = "No equation, just logic."</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SECTION 3: LOW-PASS ─── -->
+<div class="section" id="lowpass">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h1 class="section-title">Low-Pass Filters (Smoothing / Blurring)</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What is a Low-Pass Filter?</div>
+    <p>A low-pass filter <span class="hl">blurs the image</span> by averaging nearby pixels. It removes high-frequency content (sharp edges, noise) and keeps low-frequency content (general shapes).</p>
+    <p><strong>Two golden rules for any smoothing/averaging mask:</strong></p>
+    <div class="formula">
+      Rule 1:  All weights must be POSITIVE (≥ 0)<br>
+      Rule 2:  Sum of all weights MUST EQUAL 1
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Box Filter (Simple Averaging)</div>
+    <p>Every weight in the mask is <span class="hl">equal</span>. Treats the center pixel and corner pixels as equally important.</p>
+    <div class="kernel-wrap">
+      <div class="kernel-block">
+        <div class="kernel-label">3×3 Box Filter</div>
+        <div class="kernel k3">
+          <span>1/9</span><span>1/9</span><span>1/9</span>
+          <span>1/9</span><span class="center">1/9</span><span>1/9</span>
+          <span>1/9</span><span>1/9</span><span>1/9</span>
+        </div>
+      </div>
+    </div>
+    <div class="example">
+      <div class="example-title">✏️ Worked Example — Box Filter</div>
+      <p>Apply 3×3 averaging to the center pixel (18) of this 3×3 region:</p>
+      <div class="pixel-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <span>9</span><span>9</span><span>9</span>
+        <span>9</span><span class="hl-cell">18</span><span>9</span>
+        <span>9</span><span>9</span><span>9</span>
+      </div>
+      <div class="steps" style="margin-top:12px;">
+        <div class="step"><div class="step-num">1</div><p>Sum all 9 pixels: 9×8 + 18 = 72 + 18 = 90</p></div>
+        <div class="step"><div class="step-num">2</div><p>Multiply each by 1/9 and sum = 90 × (1/9) = <strong>10</strong></p></div>
+        <div class="step"><div class="step-num">3</div><p>Center pixel 18 → <span class="hl3">10</span> (the average is lower because 18 was an outlier)</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Weighted Average Filter</div>
+    <p>Weights are <span class="hl">NOT equal</span>. Center pixel gets the highest weight; weights decrease toward edges. Less blurring than box filter because original center pixel is trusted more.</p>
+    <div class="kernel-wrap">
+      <div class="kernel-block">
+        <div class="kernel-label">3×3 Weighted (÷16)</div>
+        <div class="kernel k3">
+          <span>1/16</span><span>2/16</span><span>1/16</span>
+          <span>2/16</span><span class="center">4/16</span><span>2/16</span>
+          <span>1/16</span><span>2/16</span><span>1/16</span>
+        </div>
+      </div>
+    </div>
+    <div class="tip"><div class="tip-title">🔑 Key Rule</div>
+    <p>Sum of raw weights = 16, so divide by 16. This ensures sum = 1. Center weight (4) > edge weight (2) > corner weight (1).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Gaussian Filter</div>
+    <p>The Gaussian filter is a special <span class="hl">weighted average</span> where weights come from the Gaussian (bell curve) function. Weights fall off smoothly with distance from center.</p>
+    <div class="formula">
+      <span class="label">Gaussian function</span>
+      G(x,y) = (1/2πσ²) · e^(-(x²+y²)/2σ²)<br><br>
+      σ (sigma) = controls how wide/strong the blur is<br>
+      Larger σ → heavier blur → bigger kernel needed
+    </div>
+    <div class="kernel-wrap">
+      <div class="kernel-block">
+        <div class="kernel-label">Gaussian approx (σ≈1)</div>
+        <div class="kernel k3">
+          <span>1</span><span>2</span><span>1</span>
+          <span>2</span><span class="center">4</span><span>2</span>
+          <span>1</span><span>2</span><span>1</span>
+        </div>
+      </div>
+    </div>
+    <table style="margin-top:12px;">
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>Type</td><td><span class="badge linear">LINEAR</span> <span class="badge low">LOW-PASS</span></td></tr>
+      <tr><td>Symmetric?</td><td style="color:var(--accent3)">Yes → Correlation = Convolution</td></tr>
+      <tr><td>Sum of weights</td><td>Must = 1 (divide by 16)</td></tr>
+      <tr><td>Use case</td><td>Smooth + blur, remove Gaussian noise</td></tr>
+    </table>
+    <div class="tip"><div class="tip-title">📌 Gaussian vs Box Filter</div>
+    <p>Gaussian gives smoother, more natural blur. Box filter is simpler but creates "ringing" artifacts. Both are low-pass linear filters.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Effect of Mask Size</div>
+    <table>
+      <tr><th>Mask Size</th><th>Effect</th></tr>
+      <tr><td>3×3</td><td>Mild smoothing, minor noise removal</td></tr>
+      <tr><td>7×7</td><td>Moderate blur, some edge loss</td></tr>
+      <tr><td>15×15, 35×35</td><td>Heavy blur — tiny objects disappear, only large shapes survive</td></tr>
+    </table>
+    <p style="margin-top:10px;font-size:14px;">This is used in the <span class="hl">3-step object extraction</span> method: Heavy Blur → Threshold → Point-by-Point Multiply with original.</p>
+  </div>
+</div>
+
+<!-- ─── SECTION 4: HIGH-PASS ─── -->
+<div class="section" id="highpass">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h1 class="section-title">High-Pass Filters (Sharpening)</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What is a High-Pass Filter?</div>
+    <p>The <span class="hl">opposite of blurring</span>. Sharpening filters highlight edges, lines, and fine details by amplifying high-frequency content. They work by detecting where the image changes rapidly.</p>
+    <p><strong>Two golden rules for any sharpening mask:</strong></p>
+    <div class="formula">
+      Rule 1:  Weights must have BOTH positive AND negative values<br>
+      Rule 2:  Sum of all weights MUST EQUAL 0
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Generic Sharpening Kernel</div>
+    <div class="kernel-wrap">
+      <div class="kernel-block">
+        <div class="kernel-label">8-neighbor sharpening</div>
+        <div class="kernel k3">
+          <span class="neg">-1</span><span class="neg">-1</span><span class="neg">-1</span>
+          <span class="neg">-1</span><span class="center pos">8</span><span class="neg">-1</span>
+          <span class="neg">-1</span><span class="neg">-1</span><span class="neg">-1</span>
+        </div>
+      </div>
+    </div>
+    <div class="formula">
+      Verify: 8 × (-1) + 8 = -8 + 8 = 0  ✓
+    </div>
+    <p>This produces an image with <span class="hl">only edges</span> — bright where the image changes sharply, zero where it is flat.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">High-Pass vs Low-Pass — Summary</div>
+    <table>
+      <tr><th>Property</th><th>Low-Pass (Blur)</th><th>High-Pass (Sharpen)</th></tr>
+      <tr><td>Weights</td><td>All positive</td><td>Mix of + and −</td></tr>
+      <tr><td>Sum of weights</td><td style="color:var(--accent)">= 1</td><td style="color:var(--accent2)">= 0</td></tr>
+      <tr><td>Effect</td><td>Blurs image, removes noise</td><td>Highlights edges</td></tr>
+      <tr><td>Frequency content</td><td>Keeps low freq, removes high</td><td>Keeps high freq, removes low</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ─── SECTION 5: LAPLACIAN ─── -->
+<div class="section" id="laplacian">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h1 class="section-title">Laplacian Filter + Composite</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What is the Laplacian?</div>
+    <p>The Laplacian is the <span class="hl">second-order derivative</span> of an image. It measures how much the intensity changes in all directions simultaneously. It's the main tool for edge/detail detection using second derivatives.</p>
+    <div class="formula">
+      <span class="label">Second derivative definition</span>
+      ∂²f/∂x² = f(x+1,y) + f(x-1,y) - 2f(x,y)   ← in x-direction<br>
+      ∂²f/∂y² = f(x,y+1) + f(x,y-1) - 2f(x,y)   ← in y-direction<br><br>
+      ∇²f = ∂²f/∂x² + ∂²f/∂y²   (Laplacian = sum of both)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">4-Connectivity Laplacian Kernel</div>
+    <p>Expanding ∇²f gives us the kernel below. Only looks at 4 direct neighbors (up/down/left/right).</p>
+    <div class="kernel-wrap">
+      <div class="kernel-block">
+        <div class="kernel-label">4-connectivity kernel</div>
+        <div class="kernel k3">
+          <span class="zero">0</span><span class="neg">-1</span><span class="zero">0</span>
+          <span class="neg">-1</span><span class="center pos">4</span><span class="neg">-1</span>
+          <span class="zero">0</span><span class="neg">-1</span><span class="zero">0</span>
+        </div>
+      </div>
+      <div class="kernel-block">
+        <div class="kernel-label">8-connectivity kernel</div>
+        <div class="kernel k3">
+          <span class="neg">-1</span><span class="neg">-1</span><span class="neg">-1</span>
+          <span class="neg">-1</span><span class="center pos">8</span><span class="neg">-1</span>
+          <span class="neg">-1</span><span class="neg">-1</span><span class="neg">-1</span>
+        </div>
+      </div>
+    </div>
+    <div class="formula">
+      <span class="label">Simplified formula (4-connectivity)</span>
+      L(x,y) = 4·f(x,y) - f(x-1,y) - f(x+1,y) - f(x,y-1) - f(x,y+1)<br><br>
+               = 4·center − top − bottom − left − right
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Composite (Sharpened) Image</div>
+    <p>The Laplacian alone gives edges only — the original intensity is gone. To sharpen the image while keeping detail, we <span class="hl">add the Laplacian back to the original</span>:</p>
+    <div class="formula">
+      <span class="label">Composite filter formula</span>
+      C(x,y) = f(x,y) + L(x,y)     ← Sharpened image<br><br>
+      (This is equivalent to "unsharp masking" — adds back the edges)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Full Worked Example (from your Quiz 1)</div>
+    <p>Input image:</p>
+    <div class="formula" style="font-size:13px;">
+      2  3  4  1  5<br>
+      1  4  5  3  1<br>
+      2  7  6  5  1<br>
+      1  2  1  2  1<br>
+      4  4  1  2  1
+    </div>
+    <p>Boundary rows/cols are copied as-is. Interior pixels (rows 1–3, cols 1–3 in 0-indexing):</p>
+    <div class="example">
+      <div class="example-title">✏️ Laplacian calculations (4-connect)</div>
+      <p><strong>(1,1) center=4:</strong> 4·4 − 3(top) − 7(bot) − 1(left) − 5(right) = 16−16 = <span class="hl3">0</span></p>
+      <p><strong>(1,2) center=5:</strong> 4·5 − 4(top) − 6(bot) − 4(left) − 3(right) = 20−17 = <span class="hl3">3</span></p>
+      <p><strong>(1,3) center=3:</strong> 4·3 − 1(top) − 5(bot) − 5(left) − 1(right) = 12−12 = <span class="hl3">0</span></p>
+      <p><strong>(2,1) center=7:</strong> 4·7 − 4(top) − 2(bot) − 2(left) − 6(right) = 28−14 = <span class="hl3">14</span></p>
+      <p><strong>(2,2) center=6:</strong> 4·6 − 5(top) − 1(bot) − 7(left) − 5(right) = 24−18 = <span class="hl3">6</span></p>
+      <p><strong>(2,3) center=5:</strong> 4·5 − 3(top) − 2(bot) − 6(left) − 1(right) = 20−12 = <span class="hl3">8</span></p>
+      <p><strong>(3,1) center=2:</strong> 4·2 − 7(top) − 4(bot) − 1(left) − 1(right) = 8−13 = <span class="hl2">-5</span></p>
+      <p><strong>(3,2) center=1:</strong> 4·1 − 6(top) − 1(bot) − 2(left) − 2(right) = 4−11 = <span class="hl2">-7</span></p>
+      <p><strong>(3,3) center=2:</strong> 4·2 − 5(top) − 2(bot) − 1(left) − 1(right) = 8−9 = <span class="hl2">-1</span></p>
+    </div>
+    <p style="margin-top:14px;"><strong>Output Image 1 (Laplacian):</strong></p>
+    <div class="formula" style="font-size:13px;">
+       2   3   4   1   5  (boundary — unchanged)<br>
+       1   0   3   0   1<br>
+       2  14   6   8   1<br>
+       1  -5  -7  -1   1<br>
+       4   4   1   2   1  (boundary — unchanged)
+    </div>
+    <p style="margin-top:14px;"><strong>Output Image 2 (Composite = Original + Laplacian):</strong></p>
+    <div class="formula" style="font-size:13px;">
+       2   3   4   1   5<br>
+       1  4+0  5+3  3+0  1  →  1   4   8   3   1<br>
+       2  7+14 6+6  5+8  1  →  2  21  12  13   1<br>
+       1  2-5  1-7  2-1  1  →  1  -3  -6   1   1<br>
+       4   4   1   2   1
+    </div>
+    <div class="tip"><div class="tip-title">📌 Observation</div>
+    <p>Composite sharpens: flat areas stay similar (4→4), edges get amplified (7→21). Negative values indicate strong edges; in 8-bit output they're clamped to 0.</p></div>
+  </div>
+</div>
+
+<!-- ─── SECTION 6: SOBEL ─── -->
+<div class="section" id="sobel">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h1 class="section-title">Sobel Filter — Edge Detection</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What Does Sobel Do?</div>
+    <p>Sobel detects edges using the <span class="hl">first-order derivative</span> — it measures how fast the pixel values are changing. Unlike Laplacian (2nd derivative), Sobel is more noise-resistant because it also does some smoothing.</p>
+    <p>There are <span class="hl">two separate kernels</span>: one for horizontal edges (Gy) and one for vertical edges (Gx).</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Two Sobel Kernels</div>
+    <div class="kernel-wrap">
+      <div class="kernel-block">
+        <div class="kernel-label">Gx — Detects Vertical Edges</div>
+        <div class="kernel k3">
+          <span class="neg">-1</span><span class="zero">0</span><span class="pos">+1</span>
+          <span class="neg">-2</span><span class="center zero">0</span><span class="pos">+2</span>
+          <span class="neg">-1</span><span class="zero">0</span><span class="pos">+1</span>
+        </div>
+      </div>
+      <div class="kernel-block">
+        <div class="kernel-label">Gy — Detects Horizontal Edges</div>
+        <div class="kernel k3">
+          <span class="neg">-1</span><span class="neg">-2</span><span class="neg">-1</span>
+          <span class="zero">0</span><span class="center zero">0</span><span class="zero">0</span>
+          <span class="pos">+1</span><span class="pos">+2</span><span class="pos">+1</span>
+        </div>
+      </div>
+    </div>
+    <div class="formula">
+      <span class="label">Gradient magnitude</span>
+      G = √(Gx² + Gy²)     ← exact<br>
+      G ≈ |Gx| + |Gy|       ← approximate (used in exam questions)<br><br>
+      Direction: θ = arctan(Gy / Gx)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">How to Apply Sobel — Step by Step</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><p>Take the 3×3 neighborhood around your center pixel</p></div>
+      <div class="step"><div class="step-num">2</div><p>Apply Gx: <span class="mono">(-1·P1 + 0·P2 + 1·P3) + (-2·P4 + 0·P5 + 2·P6) + (-1·P7 + 0·P8 + 1·P9)</span></p></div>
+      <div class="step"><div class="step-num">3</div><p>Apply Gy: <span class="mono">(-1·P1 - 2·P2 - 1·P3) + (0·P4 + 0·P5 + 0·P6) + (1·P7 + 2·P8 + 1·P9)</span></p></div>
+      <div class="step"><div class="step-num">4</div><p>Combine: G = |Gx| + |Gy|</p></div>
+    </div>
+    <div class="example">
+      <div class="example-title">✏️ Quick Example</div>
+      <p>3×3 neighborhood (P = pixel values):</p>
+      <div class="pixel-grid" style="grid-template-columns:repeat(3,1fr);margin:8px 0;">
+        <span>10</span><span>10</span><span>10</span>
+        <span>10</span><span class="hl-cell">10</span><span>100</span>
+        <span>10</span><span>10</span><span>100</span>
+      </div>
+      <p><strong>Gx</strong> = (-1·10 + 0·10 + 1·10) + (-2·10 + 0·10 + 2·100) + (-1·10 + 0·10 + 1·100)</p>
+      <p>= (0) + (-20 + 200) + (-10 + 100) = 0 + 180 + 90 = <span class="hl">270</span></p>
+      <p><strong>Gy</strong> = (-1·10 - 2·10 - 1·10) + 0 + (1·10 + 2·10 + 1·100)</p>
+      <p>= -40 + 0 + 130 = <span class="hl">90</span></p>
+      <p><strong>G</strong> = |270| + |90| = <span class="hl3">360</span> (strong edge!)</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Sobel vs Laplacian</div>
+    <table>
+      <tr><th>Property</th><th>Sobel</th><th>Laplacian</th></tr>
+      <tr><td>Derivative order</td><td>1st</td><td>2nd</td></tr>
+      <tr><td>Direction sensitive?</td><td style="color:var(--accent3)">Yes (Gx, Gy)</td><td style="color:var(--accent2)">No (isotropic)</td></tr>
+      <tr><td>Noise sensitivity</td><td>Lower (has smoothing)</td><td>Higher</td></tr>
+      <tr><td>Kernels needed</td><td>Two (Gx + Gy)</td><td>One</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ─── SECTION 7: NON-LINEAR ─── -->
+<div class="section" id="nonlinear">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h1 class="section-title">Non-Linear Filters</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Median Filter</div>
+    <p>Sort all values under the mask. Pick the <span class="hl">middle value</span>.</p>
+    <div class="formula">
+      Sort pixels → pick middle value (median)
+    </div>
+    <table>
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>Type</td><td><span class="badge nonlinear">NON-LINEAR</span></td></tr>
+      <tr><td>Best for</td><td>Removing <strong>Salt and Pepper noise</strong> (random black AND white dots)</td></tr>
+      <tr><td>Key advantage</td><td>Preserves edges better than averaging filter</td></tr>
+    </table>
+    <div class="example">
+      <div class="example-title">✏️ Example</div>
+      <p>Values under 3×3 mask: 2, 3, 4, 6, 5, 4, 1, 2, 1</p>
+      <p>Sorted: 1, 1, 2, 2, <strong>3</strong>, 4, 4, 5, 6 → Median = <span class="hl3">3</span></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Max Filter</div>
+    <p>Pick the <span class="hl">largest value</span> under the mask.</p>
+    <table>
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>Type</td><td><span class="badge nonlinear">NON-LINEAR</span></td></tr>
+      <tr><td>Best for</td><td>Removing <strong>Pepper noise</strong> (pure black 0-value dots)</td></tr>
+      <tr><td>Why?</td><td>Black = 0. Taking the max eliminates zeros → removes black dots</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Min Filter</div>
+    <p>Pick the <span class="hl">smallest value</span> under the mask.</p>
+    <table>
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>Type</td><td><span class="badge nonlinear">NON-LINEAR</span></td></tr>
+      <tr><td>Best for</td><td>Removing <strong>Salt noise</strong> (pure white 255-value dots)</td></tr>
+      <tr><td>Why?</td><td>White = 255. Taking the min eliminates 255s → removes white dots</td></tr>
+    </table>
+    <div class="tip"><div class="tip-title">⚡ Memory Trick</div>
+    <p><strong>Salt</strong> (white dots) = Min filter. <strong>Pepper</strong> (black dots) = Max filter. <strong>Both</strong> (salt+pepper) = Median filter.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Summary Comparison</div>
+    <table>
+      <tr><th>Filter</th><th>Operation</th><th>Noise Type</th></tr>
+      <tr><td>Max</td><td>Pick highest value</td><td>Pepper (black dots)</td></tr>
+      <tr><td>Min</td><td>Pick lowest value</td><td>Salt (white dots)</td></tr>
+      <tr><td>Median</td><td>Pick middle value</td><td>Salt + Pepper</td></tr>
+      <tr><td>Average</td><td>Sum × weight</td><td>Gaussian noise</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ─── SECTION 8: HISTOGRAM EQ ─── -->
+<div class="section" id="histogram">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h1 class="section-title">Histogram Equalization</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What is a Histogram?</div>
+    <p>A histogram of an image counts <span class="hl">how many pixels</span> have each intensity value. X-axis = intensity (0–255), Y-axis = count.</p>
+    <div class="formula">
+      h(rk) = nk / (M × N)<br><br>
+      nk = number of pixels with intensity rk<br>
+      M×N = total number of pixels<br>
+      h(rk) = probability of that intensity
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Why Equalize?</div>
+    <p>A dark image has most pixels bunched near 0. A washed-out image has them bunched near 255. Histogram equalization <span class="hl">spreads the intensities</span> across the full 0–255 range to improve contrast.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Algorithm — Step by Step</div>
+    <div class="formula">
+      <span class="label">Transformation formula</span>
+      sk = T(rk) = (L-1) × Σ[j=0 to k] h(rj)<br><br>
+      sk = new intensity for pixels with old intensity rk<br>
+      L = number of gray levels (256 for 8-bit)<br>
+      Σh = CDF (Cumulative Distribution Function)
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><p><strong>Count pixels</strong> at each intensity level → histogram h(r)</p></div>
+      <div class="step"><div class="step-num">2</div><p><strong>Normalize</strong> by total pixels → probability p(r) = count / total</p></div>
+      <div class="step"><div class="step-num">3</div><p><strong>Cumulative Sum</strong> (CDF): add each p(r) progressively from 0 up</p></div>
+      <div class="step"><div class="step-num">4</div><p><strong>Multiply CDF by (L−1)</strong> = 255 and round → new intensity level</p></div>
+      <div class="step"><div class="step-num">5</div><p><strong>Replace</strong> all original pixels with their new values</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Worked Example</div>
+    <p>4-bit image (L=16, so max intensity = 15). Total pixels = 64.</p>
+    <div class="example">
+      <div class="example-title">✏️ Histogram Equalization</div>
+      <table>
+        <tr><th>r (intensity)</th><th>Count nk</th><th>p(r) = nk/64</th><th>CDF Σp</th><th>s = round(15 × CDF)</th></tr>
+        <tr><td>0</td><td>10</td><td>0.156</td><td>0.156</td><td>2</td></tr>
+        <tr><td>2</td><td>8</td><td>0.125</td><td>0.281</td><td>4</td></tr>
+        <tr><td>5</td><td>15</td><td>0.234</td><td>0.515</td><td>8</td></tr>
+        <tr><td>9</td><td>20</td><td>0.313</td><td>0.828</td><td>12</td></tr>
+        <tr><td>14</td><td>11</td><td>0.172</td><td>1.000</td><td>15</td></tr>
+      </table>
+      <p style="margin-top:10px;">Notice how the dark image (bunched at 0,2) gets spread out to use values 2,4,8,12,15.</p>
+    </div>
+    <div class="tip"><div class="tip-title">📌 Key Points</div>
+    <p>• The shape of the output histogram is approximately flat (uniform) — that's the goal.<br>
+    • CDF always ends at exactly 1.0.<br>
+    • This is a <strong>point/pixel operation</strong> — each output pixel depends only on its own input value (no neighborhood needed).</p></div>
+  </div>
+</div>
+
+<!-- ─── SECTION 9: GEOMETRIC TRANSFORMS ─── -->
+<div class="section" id="geom">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h1 class="section-title">Geometric Transformations</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What are Geometric Transformations?</div>
+    <p>Instead of changing pixel values, geometric transforms change <span class="hl">where pixels are located</span>. They move, scale, or rotate the image.</p>
+    <p>All geometric transforms can be written as a <strong>matrix multiplication</strong> using homogeneous coordinates:</p>
+    <div class="formula">
+      [x']   [T] × [x]<br>
+      [y'] =       [y]<br>
+      [1 ]         [1]
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Translation</div>
+    <p>Shifts the image by <span class="hl">(tx, ty)</span>. Every point moves by the same amount.</p>
+    <div class="formula">
+      <span class="label">Equations</span>
+      x' = x + tx<br>
+      y' = y + ty<br><br>
+      Matrix form:<br>
+      |1  0  tx|   |x|   |x + tx|<br>
+      |0  1  ty| × |y| = |y + ty|<br>
+      |0  0   1|   |1|   |  1   |
+    </div>
+    <div class="example">
+      <div class="example-title">✏️ Quiz 2 Example — Translation by (-1, -1)</div>
+      <table>
+        <tr><th>Point</th><th>Original</th><th>Formula</th><th>Translated</th></tr>
+        <tr><td>A</td><td>(1,1)</td><td>(1-1, 1-1)</td><td style="color:var(--accent3)">A'(0,0)</td></tr>
+        <tr><td>B</td><td>(3,1)</td><td>(3-1, 1-1)</td><td style="color:var(--accent3)">B'(2,0)</td></tr>
+        <tr><td>C</td><td>(3,3)</td><td>(3-1, 3-1)</td><td style="color:var(--accent3)">C'(2,2)</td></tr>
+        <tr><td>D</td><td>(1,3)</td><td>(1-1, 3-1)</td><td style="color:var(--accent3)">D'(0,2)</td></tr>
+      </table>
+      <p style="margin-top:8px;">Shape, size, and orientation are preserved. Only position changes. This is a <strong>rigid body transformation</strong>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Scaling</div>
+    <p>Resizes the image by factors <span class="hl">sx</span> (horizontal) and <span class="hl">sy</span> (vertical).</p>
+    <div class="formula">
+      x' = sx · x<br>
+      y' = sy · y<br><br>
+      Matrix:<br>
+      |sx  0   0|<br>
+      |0   sy  0|<br>
+      |0   0   1|
+    </div>
+    <div class="tip"><div class="tip-title">📌 Cases</div>
+    <p>sx = sy → Uniform scaling (aspect ratio preserved)<br>
+    sx ≠ sy → Non-uniform (stretches/squishes)<br>
+    sx = sy = 2 → Image doubles in size<br>
+    sx = sy = 0.5 → Image halves in size</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Rotation</div>
+    <p>Rotates the image by angle <span class="hl">θ</span> around the origin.</p>
+    <div class="formula">
+      x' = x·cosθ - y·sinθ<br>
+      y' = x·sinθ + y·cosθ<br><br>
+      Matrix:<br>
+      |cosθ  -sinθ  0|<br>
+      |sinθ   cosθ  0|<br>
+      |0      0     1|
+    </div>
+    <div class="tip"><div class="tip-title">⚡ Memory Aid</div>
+    <p>x' = cos, -sin row.  y' = sin, cos row.  Think: "cos-sin / sin+cos"</p>
+    <p style="margin-top:6px;">These equations come from the quiz past paper (Q2B): "Show Laplacian is isotropic" uses x = x'cosθ − y'sinθ, y = x'sinθ + y'cosθ.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">All Three — Summary Matrix</div>
+    <table>
+      <tr><th>Transform</th><th>Equations</th><th>Changes</th></tr>
+      <tr><td>Translation</td><td>x'=x+tx, y'=y+ty</td><td>Position only</td></tr>
+      <tr><td>Scaling</td><td>x'=sx·x, y'=sy·y</td><td>Size (+ position)</td></tr>
+      <tr><td>Rotation</td><td>x'=x·cosθ-y·sinθ, y'=x·sinθ+y·cosθ</td><td>Orientation (+ position)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ─── SECTION 10: MAPPING ─── -->
+<div class="section" id="mapping">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h1 class="section-title">Forward vs Backward Mapping</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Problem</div>
+    <p>When you apply a geometric transform, you need to fill in the pixels of the output image. <span class="hl">How?</span> There are two approaches:</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Forward Mapping</div>
+    <p>For each pixel in the <span class="hl">input</span> image, compute where it goes in the <span class="hl">output</span> image.</p>
+    <div class="formula">
+      For each (x, y) in INPUT:<br>
+        compute (x', y') = T(x, y)<br>
+        output[x'][y'] = input[x][y]
+    </div>
+    <div class="tip"><div class="tip-title">⚠️ Problem</div>
+    <p><strong>Holes!</strong> Multiple input pixels might map to the same output location, or some output pixels might get no input pixel at all (gaps appear). This makes forward mapping impractical for most use cases.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Backward (Inverse) Mapping ← Preferred</div>
+    <p>For each pixel in the <span class="hl">output</span> image, compute where it came from in the <span class="hl">input</span> image. Uses the <strong>inverse transform T⁻¹</strong>.</p>
+    <div class="formula">
+      For each (x', y') in OUTPUT:<br>
+        compute (x, y) = T⁻¹(x', y')<br>
+        output[x'][y'] = input[x][y]<br><br>
+      → Every output pixel is always filled (no holes!)<br>
+      → Interpolation used when (x,y) falls between pixels
+    </div>
+    <div class="tip"><div class="tip-title">✅ Why Backward is Better</div>
+    <p>No holes in the output. Every output pixel gets a value. The input coordinates might be fractional — we use <strong>interpolation</strong> to handle that.</p></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Comparison Table</div>
+    <table>
+      <tr><th>Property</th><th>Forward Mapping</th><th>Backward Mapping</th></tr>
+      <tr><td>Direction</td><td>Input → Output</td><td>Output → Input</td></tr>
+      <tr><td>Transform used</td><td>T(x,y) = (x',y')</td><td>T⁻¹(x',y') = (x,y)</td></tr>
+      <tr><td>Holes in output?</td><td style="color:var(--accent2)">Yes — problem!</td><td style="color:var(--accent3)">No</td></tr>
+      <tr><td>Preferred?</td><td>No</td><td style="color:var(--accent3)">Yes</td></tr>
+      <tr><td>Interpolation needed?</td><td>No</td><td>Yes (fractional coords)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ─── SECTION 11: BILINEAR INTERPOLATION ─── -->
+<div class="section" id="bilinear">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h1 class="section-title">Bilinear Interpolation</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Why Do We Need Interpolation?</div>
+    <p>In backward mapping, the calculated source coordinates (x, y) are often <span class="hl">fractional</span> (e.g., 2.3, 4.7). But image pixels only exist at integer coordinates! Interpolation estimates the value at the fractional position.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Nearest Neighbor (Simplest — for comparison)</div>
+    <p>Just round to the nearest pixel. Fast but produces blocky, pixelated results.</p>
+    <div class="formula">f(2.3, 4.7) ≈ f(2, 5)  ← just round</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Bilinear Interpolation</div>
+    <p>Uses the <span class="hl">4 nearest pixels</span> (the surrounding 2×2 square). Does linear interpolation twice — once in x, once in y.</p>
+    <div class="formula">
+      <span class="label">Setup — 4 surrounding pixels</span>
+      Let fractional point = (x, y) where x = i + a,  y = j + b  (a,b between 0 and 1)<br><br>
+      Q11 = f(i, j)     Q12 = f(i, j+1)<br>
+      Q21 = f(i+1, j)   Q22 = f(i+1, j+1)
+    </div>
+    <div class="formula">
+      <span class="label">Bilinear formula</span>
+      f(x,y) ≈ (1-a)(1-b)·Q11 + (1-a)·b·Q12<br>
+             + a·(1-b)·Q21 + a·b·Q22
+    </div>
+    <div class="example">
+      <div class="example-title">✏️ Worked Example</div>
+      <p>Find value at (1.5, 1.5). Surrounding pixels:</p>
+      <div class="pixel-grid" style="grid-template-columns:repeat(2,1fr); margin:8px 0;">
+        <span>f(1,1)=10</span><span>f(1,2)=20</span>
+        <span>f(2,1)=30</span><span>f(2,2)=40</span>
+      </div>
+      <p>Here a = 0.5, b = 0.5</p>
+      <p>f(1.5, 1.5) = (0.5)(0.5)·10 + (0.5)(0.5)·20 + (0.5)(0.5)·30 + (0.5)(0.5)·40</p>
+      <p>= 0.25·10 + 0.25·20 + 0.25·30 + 0.25·40</p>
+      <p>= 2.5 + 5 + 7.5 + 10 = <span class="hl3">25</span> (the average of all four — makes sense!)</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Comparison — Interpolation Methods</div>
+    <table>
+      <tr><th>Method</th><th>Pixels Used</th><th>Quality</th><th>Speed</th></tr>
+      <tr><td>Nearest Neighbor</td><td>1</td><td>Blocky/pixelated</td><td>Fastest</td></tr>
+      <tr><td>Bilinear</td><td>4 (2×2)</td><td>Smooth</td><td>Medium</td></tr>
+      <tr><td>Bicubic</td><td>16 (4×4)</td><td>Best quality</td><td>Slowest</td></tr>
+    </table>
+    <div class="tip"><div class="tip-title">📌 Exam Tip</div>
+    <p>Bilinear = linear interp done twice (in x, then in y). The formula weights each of the 4 neighbors by its proximity — closer neighbor gets higher weight.</p></div>
+  </div>
+</div>
+
+<!-- ─── CHEAT SHEET ─── -->
+<div class="section" id="cheatsheet">
+  <div class="section-header">
+    <span class="section-num">⚡</span>
+    <h1 class="section-title">Exam Cheat Sheet</h1>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Filters — Quick Reference</div>
+    <table>
+      <tr><th>Filter</th><th>Type</th><th>Sum of weights</th><th>Use</th></tr>
+      <tr><td>Box / Averaging</td><td><span class="badge linear">LINEAR</span> <span class="badge low">LOW</span></td><td style="color:var(--accent)">= 1</td><td>Blur, noise removal</td></tr>
+      <tr><td>Weighted Average</td><td><span class="badge linear">LINEAR</span> <span class="badge low">LOW</span></td><td style="color:var(--accent)">= 1 (center highest)</td><td>Smoother blur</td></tr>
+      <tr><td>Gaussian</td><td><span class="badge linear">LINEAR</span> <span class="badge low">LOW</span></td><td style="color:var(--accent)">= 1</td><td>Smooth natural blur</td></tr>
+      <tr><td>Sharpening</td><td><span class="badge linear">LINEAR</span> <span class="badge high">HIGH</span></td><td style="color:var(--accent2)">= 0</td><td>Highlight edges</td></tr>
+      <tr><td>Laplacian (4-conn)</td><td><span class="badge linear">LINEAR</span> <span class="badge high">HIGH</span></td><td style="color:var(--accent2)">= 0</td><td>Edge detection (2nd deriv)</td></tr>
+      <tr><td>Sobel Gx / Gy</td><td><span class="badge linear">LINEAR</span> <span class="badge high">HIGH</span></td><td style="color:var(--accent2)">= 0</td><td>Edge detection (1st deriv)</td></tr>
+      <tr><td>Composite</td><td><span class="badge linear">LINEAR</span></td><td>—</td><td>f + L(x,y) = sharpened</td></tr>
+      <tr><td>Median</td><td><span class="badge nonlinear">NON-LINEAR</span></td><td>N/A</td><td>Salt+pepper noise</td></tr>
+      <tr><td>Max</td><td><span class="badge nonlinear">NON-LINEAR</span></td><td>N/A</td><td>Pepper (black) noise</td></tr>
+      <tr><td>Min</td><td><span class="badge nonlinear">NON-LINEAR</span></td><td>N/A</td><td>Salt (white) noise</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Key Kernels to Memorize</div>
+    <div class="kernel-wrap">
+      <div class="kernel-block">
+        <div class="kernel-label">Laplacian (4-conn)</div>
+        <div class="kernel k3">
+          <span class="zero">0</span><span class="neg">-1</span><span class="zero">0</span>
+          <span class="neg">-1</span><span class="center pos">4</span><span class="neg">-1</span>
+          <span class="zero">0</span><span class="neg">-1</span><span class="zero">0</span>
+        </div>
+      </div>
+      <div class="kernel-block">
+        <div class="kernel-label">Sobel Gx</div>
+        <div class="kernel k3">
+          <span class="neg">-1</span><span class="zero">0</span><span class="pos">+1</span>
+          <span class="neg">-2</span><span class="center zero">0</span><span class="pos">+2</span>
+          <span class="neg">-1</span><span class="zero">0</span><span class="pos">+1</span>
+        </div>
+      </div>
+      <div class="kernel-block">
+        <div class="kernel-label">Sobel Gy</div>
+        <div class="kernel k3">
+          <span class="neg">-1</span><span class="neg">-2</span><span class="neg">-1</span>
+          <span class="zero">0</span><span class="center zero">0</span><span class="zero">0</span>
+          <span class="pos">+1</span><span class="pos">+2</span><span class="pos">+1</span>
+        </div>
+      </div>
+      <div class="kernel-block">
+        <div class="kernel-label">Gaussian (÷16)</div>
+        <div class="kernel k3">
+          <span>1</span><span>2</span><span>1</span>
+          <span>2</span><span class="center">4</span><span>2</span>
+          <span>1</span><span>2</span><span>1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Formulas to Know</div>
+    <div class="formula">
+      Laplacian:       L(x,y) = 4·f(x,y) − top − bottom − left − right<br>
+      Composite:       C(x,y) = f(x,y) + L(x,y)<br>
+      Gradient (Sobel): G ≈ |Gx| + |Gy|<br>
+      Translation:     x' = x + tx,  y' = y + ty<br>
+      Scaling:         x' = sx·x,   y' = sy·y<br>
+      Rotation:        x' = x·cosθ − y·sinθ,  y' = x·sinθ + y·cosθ<br>
+      Hist. Equalize:  sk = (L−1) × CDF(rk)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">One-Liners for MCQs</div>
+    <table>
+      <tr><th>Question</th><th>Answer</th></tr>
+      <tr><td>What removes pepper noise?</td><td>Max filter</td></tr>
+      <tr><td>What removes salt+pepper noise?</td><td>Median filter</td></tr>
+      <tr><td>Sum of weights for sharpening?</td><td>0</td></tr>
+      <tr><td>Sum of weights for blurring?</td><td>1</td></tr>
+      <tr><td>Correlation = Convolution when?</td><td>Mask is symmetric</td></tr>
+      <tr><td>Why backward mapping > forward?</td><td>No holes in output</td></tr>
+      <tr><td>Bilinear uses how many pixels?</td><td>4 (2×2 neighborhood)</td></tr>
+      <tr><td>Laplacian is what order derivative?</td><td>2nd</td></tr>
+      <tr><td>Sobel is what order derivative?</td><td>1st</td></tr>
+      <tr><td>What does histogram eq improve?</td><td>Contrast (spreads intensities)</td></tr>
+      <tr><td>Translation preserves?</td><td>Shape, size, orientation</td></tr>
+      <tr><td>Low-pass keeps what frequencies?</td><td>Low (slow changes, shapes)</td></tr>
+      <tr><td>High-pass keeps what frequencies?</td><td>High (fast changes, edges)</td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
